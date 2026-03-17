@@ -16,7 +16,7 @@ The simplest reliable path is to start from **NVIDIA’s official vLLM containe
 
 ## 1) Build the `.sif` on the cluster with a Slurm build job
 
-### Slurm build script (your example)
+### Slurm build script
 
 ```
 #!/bin/bash
@@ -210,7 +210,7 @@ This is the #1 failure mode.
 
 If you build on x86 and try to run on GH (ARM), you can end up with incompatible artifacts or assumptions.
 
-**Fix:** build on Bede in the `gh` environment like you’re doing.
+**Fix:** build on Bede in the `gh` environment.
 
 ### 3) Caches in `$HOME` (quota + performance issues)
 
