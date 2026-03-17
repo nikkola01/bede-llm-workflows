@@ -15,7 +15,7 @@ Operationally:
 ### If you want **training / fine-tuning**
 
 - On a single GH200 (96GB), you’re usually in **LoRA/QLoRA** territory for >7B–13B models (depending on sequence length + batch size).
-- Full fine-tuninhttps-bede-documentation.readth…nds to become **multi-node** and then you’re fighting queue times + distributed setup complexity.
+- Full fine-tuning [bede-documentation](https://bede-documentation.readthedocs.io/en/latest/) to become **multi-node** and then you’re fighting queue times + distributed setup complexity.
 
 ### If you want **inference**
 
