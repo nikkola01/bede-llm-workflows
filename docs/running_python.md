@@ -410,7 +410,7 @@ This section explains the two places you must modify.
 In the Slurm header, change the GPU request:
 
 ```bash
-#SBATCH --gres=gpu:**2**
+#SBATCH --gres=gpu:2
 ```
 
 This asks Slurm to allocate **two GPUs on the node** for your job.
@@ -422,7 +422,7 @@ Example:
 #SBATCH --partition=ghtest
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --gres=gpu:**2**
+#SBATCH --gres=gpu:2
 #SBATCH --time=00:15:00
 ```
 
@@ -444,13 +444,13 @@ Modify the Python code:
 ### Single-GPU version
 
 ```bash
-llm=LLM(model=args.model, tensor_parallel_size=**1**)
+llm=LLM(model=args.model, tensor_parallel_size=1)
 ```
 
 ### Multi-GPU version
 
 ```bash
-llm=LLM(model=args.model, tensor_parallel_size=**2**)
+llm=LLM(model=args.model, tensor_parallel_size=2)
 ```
 
 `tensor_parallel_size` must match the number of GPUs requested from Slurm.
