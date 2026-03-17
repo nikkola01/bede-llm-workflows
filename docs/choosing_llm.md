@@ -12,11 +12,6 @@ Operationally:
 
 ## 1) First decision: training vs inference
 
-### If you want **training / fine-tuning**
-
-- On a single GH200 (96GB), you’re usually in **LoRA/QLoRA** territory for >7B–13B models (depending on sequence length + batch size).
-- Full fine-tuning [bede-documentation](https://bede-documentation.readthedocs.io/en/latest/) to become **multi-node** and then you’re fighting queue times + distributed setup complexity.
-
 ### If you want **inference**
 
 You can comfortably run:
@@ -114,7 +109,7 @@ Bede’s docs show `ghtest` for short GPU tests and an example requesting `--
 #SBATCH --time=0:15:00
 
 nvidia-smi
-python-c"import torch; print(torch.cuda.get_device_name(0))"
+python -c "import torch; print(torch.cuda.get_device_name(0))"
 ```
 
 ### Full run (use `gh`)
