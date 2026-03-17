@@ -1,6 +1,6 @@
 # Run a vLLM OpenAI-compatible server from your Apptainer image on Bede GH nodes
 
-This guide shows how to start a **vLLM server** from an existing `.sif` image using Slurm on Bede GH nodes. It keeps things honest: the server runs **on the compute node**, not on your laptop, and reaching it usually requires **being on the same node** (or using SSH tunnelling / port forwarding via the HPC login path, if allowed).
+This guide shows how to start a **vLLM server** from an existing `.sif` image using Slurm on Bede GH nodes. The server runs **on the compute node**, not on your laptop, and reaching it usually requires **being on the same node** (or using SSH tunnelling / port forwarding via the HPC login path, if allowed).
 
 For first tests, we’ll use the `ghtest` partition (short jobs) and a small public model.
 
@@ -24,7 +24,7 @@ Jobs targeting the`gh` or `ghtest`partitions are usually submitted from a `ghlog
 
 session.
 
-Alternatively, they can be submitted from the regular login nodes using `ghbatc`or `ghrun`.
+Alternatively, they can be submitted from the regular login nodes using `ghrun`.
 
 ---
 
@@ -42,7 +42,7 @@ From there, you submit the server job with `sbatch`.
 
 ## 3) The Slurm script: `run-vllm-server.sbatch`
 
-Here is your script, followed by an explanation of what each part is doing and why.
+Here is the script, followed by an explanation of what each part is doing and why.
 
 ```bash
 #!/bin/bash
@@ -163,8 +163,6 @@ And you deliberately put it on `/nobackup` for performance and to avoid `$HOM
 
 ### `-home "$HOME_DIR:/users/$USER"`
 
-This is easy to misunderstand, so here’s the honest version:
-
 - Many tools assume `$HOME` exists and is writable.
 - On HPC, your real `$HOME` might be quota-limited or slow.
 - Some libraries cache under `~/.cache` by default.
@@ -226,7 +224,7 @@ Inside it, you create cache directories explicitly (`mkdir -p ...`) to avoid “
 You run:
 
 ```bash
-vllm serve "$MODEL" --host0.0.0.0 --port 8000
+vllm serve "$MODEL" --host 0.0.0.0 --port 8000
 ```
 
 This **does not** make the server globally accessible on the internet.
@@ -364,8 +362,6 @@ If the server is alive you should get a JSON response (models list), and `/heal
 curl -s http://0.0.0.0:8000/health
 ```
 
-**Important:** if SSH to compute nodes is blocked on your setup, use Option B below.
-
 ---
 
 ## 10) Opening the server log files
@@ -375,23 +371,9 @@ Your Slurm script writes logs here (in the directory you submitted from):
 - stdout: `vllm_server_<JOBID>.out`
 - stderr: `vllm_server_<JOBID>.err`
 
-### Quick ways to view logs
-
-- Scroll through the log:
 
 ```bash
 less vllm_server_<JOBID>.out
-```
-
-- Follow the log live (best while waiting for model download / startup):
-
-```bash
-tail-f vllm_server_<JOBID>.out
-```
-
-- If something fails, check stderr:
-
-```bash
 less vllm_server_<JOBID>.err
 ```
 
