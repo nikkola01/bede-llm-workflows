@@ -21,7 +21,7 @@ bede-llm-workflows/
 │   ├── running_python.md
 │   ├── multi_gpu.md
 │   ├── choosing_llm.md
-│   ├──setup-lamma-ccp.md
+│   ├── setup-lamma-ccp.md
 │   └── README.md
 │
 ├── containers/
@@ -68,7 +68,7 @@ bede-llm-workflows/
 3. Run a simple job:
    - `docs/running_python.md`
 
-4. (Optional) Run a server:
+4. Run a server:
    - `docs/running_server.md`
 
 5. Explore experiments:
