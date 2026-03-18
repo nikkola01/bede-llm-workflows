@@ -1,0 +1,35 @@
+Bootstrap: docker
+From: nvcr.io/nvidia/vllm:26.01-py3
+
+%post
+    set -eux
+
+    # Keep pip tooling current, but don't touch torch/vllm (Optional)
+    python3 -m pip install --upgrade pip setuptools wheel
+
+    # Use NVIDIA’s constraints file if present (prevents dependency drift)
+    CONSTRAINT=""
+    if [ -f /etc/pip/constraint.txt ]; then
+        CONSTRAINT="-c /etc/pip/constraint.txt"
+        echo "Using pip constraints at /etc/pip/constraint.txt"
+    fi
+
+    # AG2 / AutoGen deps previously hit
+    python3 -m pip install ${CONSTRAINT} \
+        diskcache \
+        cbor2
+
+    # Install AG2 and/or AutoGen (Optional)
+    python3 -m pip install ${CONSTRAINT} \
+        ag2 \
+        autogen
+
+    # Create a writable workspace inside container
+    mkdir -p /workspace
+
+%environment
+    export HF_HOME=/workspace/.cache/huggingface
+    export TOKENIZERS_PARALLELISM=false
+
+%runscript
+    exec "$@"
