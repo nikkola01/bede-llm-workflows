@@ -261,7 +261,7 @@ date
 
 Makes your host workspace visible inside the container as `/workspace`.
 
-Why it matters:
+Why it is important:
 
 - your generated Python file is stored there
 - caches are stored there
@@ -270,8 +270,6 @@ Why it matters:
 ### `-home "$HOME_DIR:/users/$USER_NAME"`
 
 Sets a writable home directory inside the container.
-
-Why it matters:
 
 - some libraries still write to `$HOME`
 - this avoids filling your real home directory quota
@@ -321,35 +319,26 @@ sbatch run_vllm_inference.sbatch
 
 To monitor the job:
 
-```bash
-squeue -u $USER --start
-```
+```bash squeue -u $USER --start```
 
 To open the output log (alternatively more/nano):
 
-```bash
-less vllm_infer_<jobid>.out
-```
+```bash 
+less vllm_infer_<jobid>.out```
 
 To follow it live:
 
-```bash
-tail-f vllm_infer_<jobid>.out
-```
+```bash 
+tail-f vllm_infer_<jobid>.out ```
 
 ---
 
 ## 6 Practical notes on model choice
 
-Your example uses:
 
 ```bash
 MODEL="Qwen/Qwen2.5-32B-Instruct"
 ```
-
-That is much larger than the earlier `facebook/opt-125m` smoke-test model.
-
-So be careful:
 
 - larger models take longer to download
 - larger models use more memory
