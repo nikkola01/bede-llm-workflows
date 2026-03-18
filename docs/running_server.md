@@ -20,9 +20,7 @@ On HPC, **compute nodes are the good place** to do this. Slurm ensures:
 - your server isn’t killed because you ran it somewhere you shouldn’t
 - logs go to files you can inspect (`.out` / `.err`).
 
-Jobs targeting the`gh` or `ghtest`partitions are usually submitted from a `ghlogin`
-
-session.
+Jobs targeting the`gh` or `ghtest`partitions are usually submitted from a `ghlogin` session.
 
 Alternatively, they can be submitted from the regular login nodes using `ghrun`.
 
@@ -172,7 +170,7 @@ By setting `--home "$HOME_DIR:/users/$USER"` you are:
 - telling Apptainer: “treat this directory on `/nobackup` as the user’s home inside the container”
 - ensuring anything that writes to `~/.cache`, `~/.config`, etc. goes to a **writable, fast** place
 
-**Why map it specifically to `/userers/``?**
+**Why map it specifically to `/users/`?**
 
 Because that matches the expected home path used inside your environment / Bede conventions. The exact container-side home path doesn’t have to be `/users/$USER`, but you must be consistent: the caches you place under `/users/$USER/...` should align with where `$HOME` points.
 
@@ -347,7 +345,7 @@ ghlogin
 1. SSH to the node where the job is running (replace `NODE`):
 
 ```
-ssh NODE
+ssh <NODE>
 ```
 
 1. Now you are *on the same node* as the server, so this will work:
