@@ -239,23 +239,6 @@ echo "[INFO] Build finished at$(date)"
 - `#SBATCH -o build-vllm-sif-%j.out`
     
     Writes logs to a file, where `%j` becomes the job ID. This makes it easy to review failures without scrolling terminal history.
-    
-
-### Shell safety + logging
-
-- `set -euo pipefail`
-    
-    Makes failures obvious and immediate:
-    
-    - `e`: exit on any command returning non-zero
-    - `u`: treat unset variables as errors (prevents “empty path” disasters)
-    - `pipefail`: fail if *any* command in a pipeline fails (not just the last one)
-- `echo "[INFO] Building SIF on $(hostname) at $(date)"`
-    
-    Adds build provenance:
-    
-    - **hostname** helps confirm where it ran
-    - **date** helps correlate with Slurm logs and cache behavior
 
 ### Apptainer cache + temporary directories (critical on Bede)
 
