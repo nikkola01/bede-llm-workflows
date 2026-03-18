@@ -174,23 +174,16 @@ MAXTOKENS="3000"
 
 These are the most important user-editable values:
 
-- `MODEL`
+- `MODEL` - The Hugging Face model name to load.
     
-    The Hugging Face model name to load.
+- `PROMPT` - The text you want to send to the model.
     
-- `PROMPT`
-    
-    The text you want to send to the model.
-    
-- `TEMPERATURE`
-    
-    Controls randomness.
+- `TEMPERATURE` - Controls randomness.
     
     - lower = more deterministic
     - higher = more varied
-- `MAXTOKENS`
-    
-    Maximum number of tokens the model is allowed to generate.
+    - 
+- `MAXTOKENS` - Maximum number of tokens the model is allowed to generate.
     
 
 ---
