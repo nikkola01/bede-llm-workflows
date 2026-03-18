@@ -13,69 +13,7 @@ The simplest reliable path is to start from **NVIDIA’s official vLLM containe
 **Bottom line:** use the NVIDIA vLLM image (or an equally appropriate vendor-provided vLLM base). If you try to pip-install vLLM on a random CUDA image, expect pain. (I did :)
 
 ---
-
-## 1) Build the `.sif` on the cluster with a Slurm build job
-
-### Slurm build script
-
-```
-#!/bin/bash
-#SBATCH --job-name=build-vllm-sif
-#SBATCH --partition=gh
-#SBATCH --time=01:00:00
-#SBATCH -A <project_id>
-#SBATCH --mem=32G
-#SBATCH -o build-vllm-sif-%j.out
-
-set-euo pipefail
-
-echo"[INFO] Building SIF on$(hostname) at$(date)"
-
-export PROJ=<project_id>
-export APPTAINER_CACHEDIR=/nobackup/projects/$PROJ/$USER/apptainer-cache
-export APPTAINER_TMPDIR=/nobackup/projects/$PROJ/$USER/apptainer-tmp
-
-mkdir -p "$APPTAINER_CACHEDIR" "$APPTAINER_TMPDIR"
-
-cd /nobackup/projects/$PROJ/$USER/containers
-
-apptainer build vllm-all-dep3.sif vllm-all-dep.def
-
-echo "[INFO] Build finished at$(date)"
-```
-
-### What each part does (and why it matters)
-
-- `#SBATCH --partition=gh`
-    
-    Builds on GH nodes (important for ABI/platform consistency when pulling/building images in an HPC setting).
-    
-- `#SBATCH --mem=32G`
-    
-    Apptainer builds can be memory-hungry (especially when unpacking Docker layers + installing Python deps). 32GB is a decent default.
-    
-- `set -euo pipefail`
-    
-    Makes the script fail fast:
-    
-    - `e`: stop on errors
-    - `u`: fail on unset vars (prevents silent path mistakes)
-    - `pipefail`: catch failures in piped commands
-- `APPTAINER_CACHEDIR` and `APPTAINER_TMPDIR` to `/nobackup/...`
-    
-    This is **key on Bede**:
-    
-    - avoids filling home quotas
-    - avoids slow filesystem bottlenecks
-    - speeds up repeated builds (cache reuse)
-- `apptainer build vllm-all-dep3.sif vllm-all-dep.def`
-    
-    Builds a single-file container image (`.sif`) from your definition file.
-    
-
----
-
-## 2) Definition file: extend NVIDIA’s vLLM base and add your extras (AG2/AutoGen)
+## 1) Definition file: extend NVIDIA’s vLLM base and add your extras (AG2/AutoGen)
 
 ### Your definition file
 
@@ -173,7 +111,7 @@ Defines what happens when you run the container directly.
 
 ---
 
-## 3) How you typically run it on Bede (pattern)
+## 2) How you typically run it on Bede (pattern)
 
 After building `vllm-all-dep3.sif`, you usually want:
 
@@ -196,41 +134,41 @@ apptainer exec--nv \
 
 ### Pitfalls and how to avoid them
 
-### 1) “I’ll just pip install vllm in a CUDA image”
+###  1 - “I’ll just pip install vllm in a CUDA image”
 
 This is the #1 failure mode.
 
 - vLLM depends on tightly-coupled CUDA + Torch + compiler toolchain pieces.
 - On GH (aarch64), binary availability can be different than x86.
     
-    **Fix:** start from NVIDIA’s vLLM base (`nvcr.io/nvidia/vllm:<tag>`) or an equivalent purpose-built image.
+**Fix:** start from NVIDIA’s vLLM base (`nvcr.io/nvidia/vllm:<tag>`) or an equivalent purpose-built image.
     
 
-### 2) Building on the wrong architecture
+### 2 - Building on the wrong architecture
 
 If you build on x86 and try to run on GH (ARM), you can end up with incompatible artifacts or assumptions.
 
 **Fix:** build on Bede in the `gh` environment.
 
-### 3) Caches in `$HOME` (quota + performance issues)
+### 3 - Caches in `$HOME` (quota + performance issues)
 
 Apptainer build cache and tmp can explode in size.
 
 **Fix:** always point `APPTAINER_CACHEDIR` and `APPTAINER_TMPDIR` at `/nobackup/...`.
 
-### 4) Accidentally upgrading Torch/CUDA dependencies
+### 4 - Accidentally upgrading Torch/CUDA dependencies
 
 A casual `pip install -U torch` or dependency resolving without constraints can silently replace core components.
 
 **Fix:** don’t touch torch/vllm; use constraints if provided.
 
-### 5) Hugging Face cache not writable
+### 5 - Hugging Face cache not writable
 
 If `HF_HOME` points somewhere read-only inside the SIF, model downloads fail.
 
 **Fix:** set `HF_HOME` to a writable path and bind it to storage (`/nobackup/...`).
 
-### 6) Forgetting `-nv`
+### 6 - Forgetting `-nv`
 
 Without `--nv`, you’ll have no GPU libs inside the container runtime.
 
@@ -238,7 +176,7 @@ Without `--nv`, you’ll have no GPU libs inside the container runtime.
 
 ---
 
-## 4) Why you should build with a Slurm script (and what each line is doing)
+## 3) Why you should build with a Slurm script (and what each line is doing)
 
 On Bede (and most HPC systems), you *can* sometimes run `apptainer build ...` interactively — but you often **shouldn’t**. A build can be CPU + RAM heavy, create lots of temporary files, and take long enough that interactive sessions (or login-node policies) become a problem. Running container builds on login nodes can degrade service for all users and may violate cluster policy.
 
@@ -393,11 +331,11 @@ sbatch build-vllm-sif.sbatch
     **Fix:** Keep builds, caches, and model caches on `/nobackup`.
     
 
-## 5) Submitting the build job
+## 4) Submitting the build job
 
 Before running the build job, you **must first connect to the GH environment using `ghlogin`**. On Bede, the GH partition is part of a separate Grace/Hopper environment, and Slurm submissions targeting that partition should be made from a **GH login session**.
 
-### Step 1 — Connect to the GH login node
+### 1 - Connect to the GH login node
 
 ```
 ghlogin -A <project_id>
@@ -413,7 +351,7 @@ Why this matters:
 
 ---
 
-### Step 2 — Navigate to the directory containing the build script
+### 2 - Navigate to the directory containing the build script
 
 For example:
 
@@ -428,7 +366,7 @@ This directory should contain:
 
 ---
 
-### Step 3 — Submit the build job
+### 3 - Submit the build job
 
 Run:
 
@@ -445,7 +383,7 @@ Slurm will then:
 
 ---
 
-### Step 4 — Monitor the job (optional)
+### 4 - Monitor the job (optional)
 
 You can check whether the job is queued or running with:
 
