@@ -133,4 +133,3 @@ Bede notes you submit to `gh`/`ghtest` either from inside `ghlogin`, or via h
 - **Forgetting ARM:** your local x86 wheels/containers may not work on `gh`. Prefer aarch64-ready conda/env/containers.
 - **Context length surprise:** a “fits at 8k” model can OOM at 32k even though weights fit.
 - **Quantization mismatch:** GPTQ/AWQ/GGUF require specific runtimes; don’t assume “quantized” automatically works with Transformers.
-- **Gated models on HPC:** test token auth early on `ghtest`.
